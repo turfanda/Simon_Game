@@ -6,21 +6,41 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href=" https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        .gDiv {
+            width: 150px;
+            height: 150px;
+            display:inline-block;
+            background-color:burlywood;
+        }
+        .opacity{
+            opacity:0.5;
+        }
+    </style>
 </head>
 <body>
     <script>
+
         $(function () {
-            $('#b1').click(function () {
+            $('#a1').click(function () {
                 $('#1').get(0).play();
+                $('#a1').addClass('opacity');
+                setTimeout(function () { $('#a1').removeClass('opacity'); }, 500);
             });
-            $('#b2').click(function () {
+            $('#a2').click(function () {
                 $('#2').get(0).play();
+                $('#a2').addClass('opacity');
+                setTimeout(function () { $('#a2').removeClass('opacity'); }, 500);
             });
-            $('#b3').click(function () {
+            $('#a3').click(function () {
                 $('#3').get(0).play();
+                $('#a3').addClass('opacity');
+                setTimeout(function () { $('#a3').removeClass('opacity'); }, 500);
             });
-            $('#b4').click(function () {
+            $('#a4').click(function () {
                 $('#4').get(0).play();
+                $('#a4').addClass('opacity');
+                setTimeout(function () { $('#a4').removeClass('opacity'); }, 500);
             });
 
         }); 
@@ -39,10 +59,15 @@
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound4.mp3" type="audio/mp3" />
     </audio>
 
-    <button id="b1"> sound 1</button>
-    <button id="b2"> sound 2</button>
-    <button id="b3"> sound 3</button>
-    <button id="b4"> sound 4</button>
+    <div id="a1" class="gDiv"></div>
+    <div id="a2" class="gDiv"></div>
+    <div id="a3" class="gDiv"></div>
+    <div id="a4" class="gDiv"></div>
+    <br/>
+    <button id="start"> start </button>
+    <button id="strict"> strict </button>
+    <button id="count"> count </button>
+    <button id="onof"> OnOf </button>
 
 </body>
 </html>
