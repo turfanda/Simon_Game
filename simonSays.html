@@ -10,16 +10,49 @@
         .gDiv {
             width: 150px;
             height: 150px;
-            display:inline-block;
-            background-color:burlywood;
+            display: inline-block;
         }
-        .opacity{
-            opacity:0.5;
+
+        #a1 {
+            background-color: red;
+        }
+
+        #a2 {
+            background-color: green;
+        }
+
+        #a3 {
+            background-color: blue;
+        }
+
+        #a4 {
+            background-color: blueviolet;
+        }
+
+        .opacity {
+            opacity: 0.5;
+        }
+
+        #onofdiv, #strictdiv {
+            background-color: black;
+            height: 15px;
+            width: 30px;
+            padding: 2px;
+        }
+
+        #onofswitch, #strictswitch {
+            background-color: white;
+            height: 15px;
+            width: 15px;
+            float: left;
         }
     </style>
 </head>
 <body>
     <script>
+        var isOn = false;
+        var isStrict = false;
+
 
         $(function () {
             $('#a1').click(function () {
@@ -42,8 +75,40 @@
                 $('#a4').addClass('opacity');
                 setTimeout(function () { $('#a4').removeClass('opacity'); }, 500);
             });
+            $('#onofswitch').click(function () {
+                var x = $(this).css('float');
+                if (x == 'left') {
+                    $(this).css('float', 'right');
+                    isOn = true;
+                    $('#onofdiv').css('background-color', 'green');
+                }
+                    
+                else {
+                    $(this).css('float', 'left');
+                    isOn = false;
+                    $('#onofdiv').css('background-color', 'black');
+                    
+                }
+                    
+            });
+            $('#strictswitch').click(function () {
+                var x = $(this).css('float');
+                if (x == 'left') {
+                    $(this).css('float', 'right');
+                    isStrict = true;
+                    $('#strictdiv').css('background-color', 'green');
+                }
 
-        }); 
+                else {
+                    $(this).css('float', 'left');
+                    isStrict = false;
+                    $('#strictdiv').css('background-color', 'black');
+
+                }
+
+            });
+
+        });
 
     </script>
     <audio id="1">
@@ -63,11 +128,13 @@
     <div id="a2" class="gDiv"></div>
     <div id="a3" class="gDiv"></div>
     <div id="a4" class="gDiv"></div>
-    <br/>
-    <button id="start"> start </button>
-    <button id="strict"> strict </button>
-    <button id="count"> count </button>
-    <button id="onof"> OnOf </button>
 
+    <div id="onofdiv">
+        <div id="onofswitch"></div>
+    </div>
+
+    <div id="strictdiv">
+        <div id="strictswitch"></div>
+    </div>
 </body>
 </html>
