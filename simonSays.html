@@ -1,12 +1,11 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title>Simon Game</title>
-    <script src="Scripts/jquery-1.12.4.js"></script>
     <script src="Scripts/jquery-1.12.4.min.js"></script>
+    <script src="Scripts/jquery-1.12.4.js"></script>
     <script src="Scripts/jquery-1.12.4.intellisense.js"></script>
-    <link rel="stylesheet" href=" https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <style>
         .gDiv {
             width: 150px;
@@ -14,19 +13,19 @@
             display: inline-block;
         }
 
-        #a1 {
+        .red {
             background-color: red;
         }
 
-        #a2 {
+        .green {
             background-color: green;
         }
 
-        #a3 {
+        .blue {
             background-color: blue;
         }
 
-        #a4 {
+        .bluev {
             background-color: blueviolet;
         }
 
@@ -55,247 +54,99 @@
 </head>
 <body>
     <script>
-        $(document).ready(function () {
-                var gameStatus = {};
-
-                gameStatus.reset = function () {
-                    this.init();
-                    this.strict = false;
-                }
-
-                gameStatus.init = function () {
-                    this.lastPush = $('#0');
-                    this.sequence = [];
-                    this.tStepInd = 0;
-                    this.index = 0;
-                    this.count = 0;
-                    this.lock = false;
-                };
-
-                function playGoodTone(num) {
-                    gainNodes[num].gain
-                        .linearRampToValueAtTime(vol, audioCtx.currentTime + ramp);
-                    gameStatus.currPush = $('#' + num);
-                    gameStatus.currPush.addClass('light');
-                };
-
-                function stopGoodTones() {
-                    if (gameStatus.currPush)
-                        gameStatus.currPush.removeClass('light');
-                    gainNodes.forEach(function (g) {
-                        g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + ramp);
-                    });
-                    gameStatus.currPush = undefined;
-                    gameStatus.currOsc = undefined;
-                };
-
-                function playErrTone() {
-                    errNode.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + ramp);
-                };
-
-                function stopErrTone() {
-                    errNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + ramp);
-                };
-
-                function gameStart() {
-                    resetTimers();
-                    stopGoodTones();
-                    stopErrTone();
-                    $('.count').text('--').removeClass('led-off');
-                    flashMessage('--', 1);
-                    gameStatus.init();
-                    addStep();
-                }
-
-                function setTimeStep(num) {
-                    var tSteps = [1250, 1000, 750, 500];
-                    if (num < 4)
-                        return tSteps[0];
-                    if (num < 8)
-                        return tSteps[1];
-                    if (num < 12)
-                        return tSteps[2];
-                    return tSteps[3];
-                }
-
-                function notifyError(pushObj) {
-                    gameStatus.lock = true;
-                    $('.push').removeClass('clickable').addClass('unclickable');
-                    playErrTone();
-                    if (pushObj)
-                        pushObj.addClass('light');
-                    gameStatus.toHndl = setTimeout(function () {
-                        stopErrTone();
-                        if (pushObj)
-                            pushObj.removeClass('light');
-                        gameStatus.toHndlSt = setTimeout(function () {
-                            if (gameStatus.strict)
-                                gameStart()
-                            else
-                                playSequence();
-                        }, 1000);
-                    }, 1000);
-                    flashMessage('!!', 2);
-                };
-
-                function notifyWin() {
-                    var cnt = 0;
-                    var last = gameStatus.lastPush.attr('id');
-                    gameStatus.seqHndl = setInterval(function () {
-                        playGoodTone(last);
-                        gameStatus.toHndl = setTimeout(stopGoodTones, 80);
-                        cnt++;
-                        if (cnt === 8) {
-                            clearInterval(gameStatus.seqHndl);
-                        }
-                    }, 160);
-                    flashMessage('**', 2);
-                }
-
-                function flashMessage(msg, times) {
-                    $('.count').text(msg);
-                    var lf = function () {
-                        $('.count').addClass('led-off');
-                        gameStatus.toHndlFl = setTimeout(function () {
-                            $('.count').removeClass('led-off');
-                        }, 250);
-                    };
-                    var cnt = 0;
-                    lf();
-                    gameStatus.flHndl = setInterval(function () {
-                        lf();
-                        cnt++;
-                        if (cnt === times)
-                            clearInterval(gameStatus.flHndl);
-                    }, 500)
-                };
-
-                function displayCount() {
-                    var p = (gameStatus.count < 10) ? '0' : '';
-                    $('.count').text(p + (gameStatus.count + ''));
-                }
-
-                function playSequence() {
-                    var i = 0;
-                    gameStatus.index = 0;
-                    gameStatus.seqHndl = setInterval(function () {
-                        displayCount();
-                        gameStatus.lock = true;
-                        playGoodTone(gameStatus.sequence[i]);
-                        gameStatus.toHndl = setTimeout(stopGoodTones, gameStatus.timeStep / 2 - 10);
-                        i++;
-                        if (i === gameStatus.sequence.length) {
-                            clearInterval(gameStatus.seqHndl);
-                            $('.push').removeClass('unclickable').addClass('clickable');
-                            gameStatus.lock = false;
-                            gameStatus.toHndl = setTimeout(notifyError, 5 * gameStatus.timeStep);
-                        }
-                    }, gameStatus.timeStep);
-                };
-
-                function addStep() {
-                    gameStatus.timeStep = setTimeStep(gameStatus.count++);
-                    gameStatus.sequence.push(Math.floor(Math.random() * 4));
-                    gameStatus.toHndl = setTimeout(playSequence, 500);
-                };
-
-                function resetTimers() {
-                    clearInterval(gameStatus.seqHndl);
-                    clearInterval(gameStatus.flHndl);
-                    clearTimeout(gameStatus.toHndl);
-                    clearTimeout(gameStatus.toHndlFl);
-                    clearTimeout(gameStatus.toHndlSt);
-                };
-
-                function pushColor(pushObj) {
-                    if (!gameStatus.lock) {
-                        clearTimeout(gameStatus.toHndl);
-                        var pushNr = pushObj.attr('id');
-                        if (pushNr == gameStatus.sequence[gameStatus.index]
-                            && gameStatus.index < gameStatus.sequence.length) {
-
-                            playGoodTone(pushNr);
-                            gameStatus.lastPush = pushObj;
-                            gameStatus.index++;
-                            if (gameStatus.index < gameStatus.sequence.length) {
-                                gameStatus.toHndl = setTimeout(notifyError, 5 * gameStatus.timeStep);
-                            } else if (gameStatus.index == 20) {
-                                $('.push').removeClass('clickable').addClass('unclickable');
-                                gameStatus.toHndl = setTimeout(notifyWin, gameStatus.timeStep);
-                            } else {
-                                $('.push').removeClass('clickable').addClass('unclickable');
-                                addStep();
-                            }
-                        } else {
-                            $('.push').removeClass('clickable').addClass('unclickable');
-                            notifyError(pushObj);
-                        }
-                    }
-                }
-
-                $('.push').mousedown(function () {
-                    pushColor($(this));
-                });
-
-                $('*').mouseup(function (e) {
-                    e.stopPropagation();
-                    if (!gameStatus.lock)
-                        stopGoodTones();
-                });
-
-
-                function toggleStrict() {
-                    $('#mode-led').toggleClass('led-on');
-                    gameStatus.strict = !gameStatus.strict;
-                }
-
-                $('.sw-slot').click(function () {
-                    $('#pwr-sw').toggleClass('sw-on');
-                    if ($('#pwr-sw').hasClass('sw-on') == false) {
-                        gameStatus.reset();
-                        $('.count').text('--');
-                        $('.count').addClass('led-off');
-                        $('#mode-led').removeClass('led-on');
-                        $('.push').removeClass('clickable').addClass('unclickable');
-                        $('#start').off('click');
-                        $('#mode').off('click');
-                        $('.btn').removeClass('unclickable').addClass('clickable');
-                        resetTimers();
-                        stopGoodTones();
-                        stopErrTone();
-                    } else {
-                        $('.btn').removeClass('unclickable').addClass('clickable');
-                        $('.count').removeClass('led-off');
-                        $('#start').click(gameStart);
-                        $('#mode').click(toggleStrict);
-                    }
-                });
-
-                gameStatus.reset();
-
+        var gameConfig = {};
+        $(function () {
+            gameConfig.starter = function () {
+                this.sequence = [];
+                this.count = 0;
+                this.timeStep = 600;
             }
+
+            function playPushSound(num) {
+                $('#s' + num).get(0).play();
+                gameConfig.currPush = $('#' + num);
+                gameConfig.currPush.addClass('opacity');
+            };
+            function stopPushSound(num) {
+                $('#' + num).removeClass('opacity');
+            };
+            function playFailSound() {
+                $('#s5').get(0).play();
+            };
+
+            function addStep() {
+                gameConfig.sequence.push(Math.floor(Math.random() * (max - min + 1) + min));
+                gameConfig.toHndl = setTimeout(playSequence, 500);
+            };
+
+
+            function gameStart() {
+                gameStatus.starter();
+                addStep();
+            }
+
+            $('#onofswitch').click(function () {
+                var x = $(this).css('float');
+                if (x == 'left') {
+                    $(this).css('float', 'right');
+                    isOn = true;
+                    $('#onofdiv').css('background-color', 'green');
+                }
+                else {
+                    $(this).css('float', 'left');
+                    isOn = false;
+                    $('#onofdiv').css('background-color', 'black');
+                    $('#strictswitch').css('float', 'left');
+                    $('#strictdiv').css('background-color', 'black');
+                }
+            });
+            $('#strictswitch').click(function () {
+                var x = $(this).css('float');
+                if (!isOn) {
+                    return;
+                }
+                else {
+                    if (x == 'left') {
+                        $(this).css('float', 'right');
+                        isStrict = true;
+                        $('#strictdiv').css('background-color', 'green');
+                    }
+                    else {
+                        $(this).css('float', 'left');
+                        isStrict = false;
+                        $('#strictdiv').css('background-color', 'black');
+                    }
+                }
+            });
+            
+            $('.gDiv').click(function () {
+                var x = $(this).attr('id');
+                playPushSound(x);
+                setTimeout(function () { stopPushSound(x); }, 400);
+            });
+            $('#stBtn').click(function () { gameStart(); });
         });
-
     </script>
-
-    <audio id="1">
+    <audio id="s1">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" type="audio/mp3" />
     </audio>
-    <audio id="2">
+    <audio id="s2">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound2.mp3 " type="audio/mp3" />
     </audio>
-    <audio id="3">
+    <audio id="s3">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound3.mp3" type="audio/mp3" />
     </audio>
-    <audio id="4">
+    <audio id="s4">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound4.mp3" type="audio/mp3" />
     </audio>
+    <audio id="s5">
+        <source src="http://www.pacdv.com/sounds/people_sound_effects/ahhh.mp3" type="audio/mp3" />
+    </audio>
 
-    <div id="a1" class="gDiv"></div>
-    <div id="a2" class="gDiv"></div>
-    <div id="a3" class="gDiv"></div>
-    <div id="a4" class="gDiv"></div>
-
+    <div id="1" class="gDiv red"></div>
+    <div id="2" class="gDiv green"></div>
+    <div id="3" class="gDiv blue"></div>
+    <div id="4" class="gDiv bluev"></div>
     <div id="onofdiv">
         <div id="onofswitch" class="inline"></div>
     </div>
