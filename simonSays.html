@@ -54,97 +54,13 @@
 </head>
 <body>
     <script>
-        var isOn = false;
-        var isStrict = false;
-        var vall;
 
-        function rnd(min, max, ct) {
-            var array = [];
-            for (var i = 0; i < ct; i++) {
-                array[i] = Math.floor(Math.random() * (max - min + 1) + min);
-            }
-            return array;
-        }
-        function play(array,index) {
-            if (array.length == index)
-                return;
-            var val ='#a' + array[index];
-            var file = $('#' + array[index]);
-            file.on("ended", function () {
-                $(val).animate({ opacity: 0.5 }, 400).animate({ opacity: 1 }, 400, play(array, index + 1));
-            });
-            file[0].play();
-        }
-        function get(array, max, ct) {
-            for (var i = 0; i < ct; i++) {
-                var val = '#a' + array[i];
-                $(val).click().delay(600);
-            }
-        }
-
-        $(function () {
-            $('#a1').click(function () {
-                $('#1').get(0).play();
-                $('#a1').addClass('opacity');
-                setTimeout(function () { $('#a1').removeClass('opacity'); }, 500);
-            });
-            $('#a2').click(function () {
-                $('#2').get(0).play();
-                $('#a2').addClass('opacity');
-                setTimeout(function () { $('#a2').removeClass('opacity'); }, 500);
-            });
-            $('#a3').click(function () {
-                $('#3').get(0).play();
-                $('#a3').addClass('opacity');
-                setTimeout(function () { $('#a3').removeClass('opacity'); }, 500);
-            });
-            $('#a4').click(function () {
-                $('#4').get(0).play();
-                $('#a4').addClass('opacity');
-                setTimeout(function () { $('#a4').removeClass('opacity'); }, 500);
-            });
-            $('#onofswitch').click(function () {
-                var x = $(this).css('float');
-                if (x == 'left') {
-                    $(this).css('float', 'right');
-                    isOn = true;
-                    $('#onofdiv').css('background-color', 'green');
-                }
-                else {
-                    $(this).css('float', 'left');
-                    isOn = false;
-                    $('#onofdiv').css('background-color', 'black');
-                    $('#strictswitch').css('float', 'left');
-                    $('#strictdiv').css('background-color', 'black');
-                }
-            });
-            $('#strictswitch').click(function () {
-                var x = $(this).css('float');
-                if (!isOn) {
-                    return;
-                }
-                else {
-                    if (x == 'left') {
-                        $(this).css('float', 'right');
-                        isStrict = true;
-                        $('#strictdiv').css('background-color', 'green');
-                    }
-                    else {
-                        $(this).css('float', 'left');
-                        isStrict = false;
-                        $('#strictdiv').css('background-color', 'black');
-                    }
-                }
-            });
-            $('#stBtn').click(function () {
-                var x = rnd(1, 4, 4)
-                $('#display').text(x);
-                play(x,0);
-            });
-
-        });
+        var gameStatus = {};
 
     </script>
+
+
+
     <audio id="1">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" type="audio/mp3" />
     </audio>
