@@ -50,6 +50,15 @@
         .inline {
             display: inline;
         }
+
+        .clickable {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .unclickable {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -60,7 +69,8 @@
                 this.sequence = [];
                 this.count = 0;
                 this.timeStep = 600;
-            }
+                gameConfig.lock = false;
+            };
 
             function playPushSound(num) {
                 $('#s' + num).get(0).play();
@@ -74,14 +84,60 @@
                 $('#s5').get(0).play();
             };
 
+            function playSequence() {
+                var i = 0;
+                gameConfig.index = 0;
+                gameConfig.seqHndl = setInterval(function () {
+                    displayCount();
+                    gameConfig.lock = true;
+                    playPushSound(gameConfig.sequence[i]);
+                    setTimeout(function () {
+                        stopPushSound(gameConfig.sequence[i])
+                        i++;
+                        if (i === gameConfig.sequence.length) {
+                            clearInterval(gameConfig.seqHndl);
+                            $('.gDiv').removeClass('unclickable').addClass('clickable');
+                            gameConfig.lock = false;
+                        }
+                    }, 400);
+                }, gameConfig.timeStep);
+            };
+
+            function pushColor(pushObj) {
+                if (!gameConfig.lock) {
+                    var pushNr = pushObj.attr('id');
+                    if (pushNr == gameConfig.sequence[gameConfig.index]&& gameConfig.index < gameConfig.sequence.length) {
+                        playPushSound(pushNr);
+                        gameConfig.lastPush = pushObj;
+                        gameConfig.index++;
+                        if (gameConfig.index < gameConfig.sequence.length) {
+                            gameConfig.toHndl = setTimeout(notifyError, 5 * gameConfig.timeStep);
+                        } else if (gameConfig.index == 20) {
+                            $('.push').removeClass('clickable').addClass('unclickable');
+                            gameConfig.toHndl = setTimeout(notifyWin, gameConfig.timeStep);
+                        } else {
+                            $('.push').removeClass('clickable').addClass('unclickable');
+                            addStep();
+                        }
+                    } else {
+                        $('.push').removeClass('clickable').addClass('unclickable');
+                        playFailSound(pushObj);
+                    }
+                }
+            }
+
+            function displayCount() {
+                $('#count').val(gameConfig.count);
+            }
+
+
             function addStep() {
-                gameConfig.sequence.push(Math.floor(Math.random() * (max - min + 1) + min));
+                gameConfig.sequence.push(Math.floor(Math.random() * 5));
                 gameConfig.toHndl = setTimeout(playSequence, 500);
             };
 
-
             function gameStart() {
-                gameStatus.starter();
+                gameConfig.starter();
                 addStep();
             }
 
@@ -118,11 +174,14 @@
                     }
                 }
             });
-            
+
             $('.gDiv').click(function () {
-                var x = $(this).attr('id');
-                playPushSound(x);
-                setTimeout(function () { stopPushSound(x); }, 400);
+
+                pushColor($(this));
+
+                //var x = $(this).attr('id');
+                //playPushSound(x);
+                //setTimeout(function () { stopPushSound(x); }, 400);
             });
             $('#stBtn').click(function () { gameStart(); });
         });
@@ -143,10 +202,10 @@
         <source src="http://www.pacdv.com/sounds/people_sound_effects/ahhh.mp3" type="audio/mp3" />
     </audio>
 
-    <div id="1" class="gDiv red"></div>
-    <div id="2" class="gDiv green"></div>
-    <div id="3" class="gDiv blue"></div>
-    <div id="4" class="gDiv bluev"></div>
+    <div id="1" class="gDiv red unclickable"></div>
+    <div id="2" class="gDiv green unclickable"></div>
+    <div id="3" class="gDiv blue unclickable"></div>
+    <div id="4" class="gDiv bluev unclickable"></div>
     <div id="onofdiv">
         <div id="onofswitch" class="inline"></div>
     </div>
@@ -154,6 +213,6 @@
         <div id="strictswitch"></div>
     </div>
     <button id="stBtn">Start Game</button>
-    <p id="display"></p>
+    <input type="text" id="count" />
 </body>
 </html>
