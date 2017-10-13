@@ -77,22 +77,23 @@
                 gameConfig.currPush = $('#' + num);
                 gameConfig.currPush.addClass('opacity');
             };
-            function stopPushSound(num) {
-                $('#' + num).removeClass('opacity');
-            };
             function playFailSound() {
                 $('#s5').get(0).play();
             };
+
+            function addStep() {
+                gameConfig.sequence.push(Math.floor(Math.random() * 5));
+                gameConfig.toHndl = setTimeout(playSequence, 500);
+            }
 
             function playSequence() {
                 var i = 0;
                 gameConfig.index = 0;
                 gameConfig.seqHndl = setInterval(function () {
-                    displayCount();
                     gameConfig.lock = true;
                     playPushSound(gameConfig.sequence[i]);
                     setTimeout(function () {
-                        stopPushSound(gameConfig.sequence[i])
+                        gameConfig.currPush.removeClass('opacity');
                         i++;
                         if (i === gameConfig.sequence.length) {
                             clearInterval(gameConfig.seqHndl);
@@ -106,35 +107,37 @@
             function pushColor(pushObj) {
                 if (!gameConfig.lock) {
                     var pushNr = pushObj.attr('id');
-                    if (pushNr == gameConfig.sequence[gameConfig.index]&& gameConfig.index < gameConfig.sequence.length) {
-                        playPushSound(pushNr);
-                        gameConfig.lastPush = pushObj;
-                        gameConfig.index++;
-                        if (gameConfig.index < gameConfig.sequence.length) {
-                            gameConfig.toHndl = setTimeout(notifyError, 5 * gameConfig.timeStep);
-                        } else if (gameConfig.index == 20) {
-                            $('.push').removeClass('clickable').addClass('unclickable');
-                            gameConfig.toHndl = setTimeout(notifyWin, gameConfig.timeStep);
-                        } else {
-                            $('.push').removeClass('clickable').addClass('unclickable');
-                            addStep();
+
+                    gameConfig.pushHndl = setInterval(function () {
+                        if (pushNr == gameConfig.sequence[gameConfig.index] && gameConfig.index < gameConfig.sequence.length) {
+                            playPushSound(pushNr);
+                            setTimeout(function () {
+                                gameConfig.currPush.removeClass('opacity');
+                                gameConfig.index++;
+
+                                if (gameConfig.index == 20) {
+                                    clearInterval(gameConfig.pushHndl)
+                                    $('.push').removeClass('clickable').addClass('unclickable');
+                                    gameConfig.toHndl = setTimeout(playFailSound(pushObj), gameConfig.timeStep);
+                                }
+                                else if (gameConfig.index == gameConfig.sequence.length) {
+                                    clearInterval(gameConfig.pushHndl)
+                                    $('.push').removeClass('clickable').addClass('unclickable');
+                                    addStep();
+                                }
+                            }, 400);
                         }
-                    } else {
-                        $('.push').removeClass('clickable').addClass('unclickable');
-                        playFailSound(pushObj);
-                    }
+                        else {
+                            $('.push').removeClass('clickable').addClass('unclickable');
+                            playFailSound(pushObj);
+                        }
+
+                    }, gameConfig.timeStep);
                 }
             }
 
-            function displayCount() {
-                $('#count').val(gameConfig.count);
-            }
 
 
-            function addStep() {
-                gameConfig.sequence.push(Math.floor(Math.random() * 5));
-                gameConfig.toHndl = setTimeout(playSequence, 500);
-            };
 
             function gameStart() {
                 gameConfig.starter();
