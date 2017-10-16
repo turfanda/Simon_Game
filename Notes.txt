@@ -1,0 +1,4 @@
+﻿Sıralı oyantma tamam
+strict mode olayına bakmak lazım.
+display ve count düzenlemesi yapılacak.
+son olarak biraz görsellik katılacak.

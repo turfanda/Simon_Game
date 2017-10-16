@@ -63,8 +63,10 @@
 </head>
 <body>
     <script>
-        var gameConfig = {};
+        
         $(function () {
+            var gameConfig = {};
+
             gameConfig.starter = function () {
                 this.sequence = [];
                 this.count = 0;
@@ -77,8 +79,13 @@
                 gameConfig.currPush = $('#' + num);
                 gameConfig.currPush.addClass('opacity');
             };
+
             function playFailSound() {
                 $('#s5').get(0).play();
+            };
+
+            function playWinSound() {
+                $('#s6').get(0).play();
             };
 
             function addStep() {
@@ -107,37 +114,28 @@
             function pushColor(pushObj) {
                 if (!gameConfig.lock) {
                     var pushNr = pushObj.attr('id');
-
-                    gameConfig.pushHndl = setInterval(function () {
-                        if (pushNr == gameConfig.sequence[gameConfig.index] && gameConfig.index < gameConfig.sequence.length) {
-                            playPushSound(pushNr);
-                            setTimeout(function () {
-                                gameConfig.currPush.removeClass('opacity');
-                                gameConfig.index++;
-
-                                if (gameConfig.index == 20) {
-                                    clearInterval(gameConfig.pushHndl)
-                                    $('.push').removeClass('clickable').addClass('unclickable');
-                                    gameConfig.toHndl = setTimeout(playFailSound(pushObj), gameConfig.timeStep);
-                                }
-                                else if (gameConfig.index == gameConfig.sequence.length) {
-                                    clearInterval(gameConfig.pushHndl)
-                                    $('.push').removeClass('clickable').addClass('unclickable');
-                                    addStep();
-                                }
-                            }, 400);
-                        }
-                        else {
-                            $('.push').removeClass('clickable').addClass('unclickable');
-                            playFailSound(pushObj);
-                        }
-
-                    }, gameConfig.timeStep);
+                    if (pushNr == gameConfig.sequence[gameConfig.index] && gameConfig.index < gameConfig.sequence.length) {
+                        playPushSound(pushNr);
+                        var x = pushNr;
+                        setTimeout(function () {
+                            gameConfig.currPush.removeClass('opacity');
+                            gameConfig.index++;
+                            if (gameConfig.index == 20) {
+                                $('.push').removeClass('clickable').addClass('unclickable');
+                                playWinSound(pushObj);
+                            }
+                            else if (gameConfig.index == gameConfig.sequence.length) {
+                               $('.push').removeClass('clickable').addClass('unclickable');
+                               addStep();
+                            }
+                        }, 400);
+                    }
+                    else {
+                        $('.push').removeClass('clickable').addClass('unclickable');
+                        playFailSound(pushObj);
+                    }
                 }
-            }
-
-
-
+            };
 
             function gameStart() {
                 gameConfig.starter();
@@ -159,6 +157,7 @@
                     $('#strictdiv').css('background-color', 'black');
                 }
             });
+
             $('#strictswitch').click(function () {
                 var x = $(this).css('float');
                 if (!isOn) {
@@ -181,13 +180,41 @@
             $('.gDiv').click(function () {
 
                 pushColor($(this));
-
-                //var x = $(this).attr('id');
-                //playPushSound(x);
-                //setTimeout(function () { stopPushSound(x); }, 400);
             });
+
             $('#stBtn').click(function () { gameStart(); });
         });
+
+
+
+
+
+        function pushColor(pushObj) {
+            if (!gameStatus.lock) {
+                clearTimeout(gameStatus.toHndl);
+                var pushNr = pushObj.attr('id');
+                if (pushNr == gameStatus.sequence[gameStatus.index] && gameStatus.index < gameStatus.sequence.length) {
+
+                    playGoodTone(pushNr);
+                    gameStatus.lastPush = pushObj;
+                    gameStatus.index++;
+                    if (gameStatus.index < gameStatus.sequence.length) {
+                        gameStatus.toHndl = setTimeout(notifyError, 5 * gameStatus.timeStep);
+                    } else if (gameStatus.index == 20) {
+                        $('.push').removeClass('clickable').addClass('unclickable');
+                        gameStatus.toHndl = setTimeout(notifyWin, gameStatus.timeStep);
+                    } else {
+                        $('.push').removeClass('clickable').addClass('unclickable');
+                        addStep();
+                    }
+                } else {
+                    $('.push').removeClass('clickable').addClass('unclickable');
+                    notifyError(pushObj);
+                }
+            }
+        }
+
+
     </script>
     <audio id="s1">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" type="audio/mp3" />
@@ -203,6 +230,9 @@
     </audio>
     <audio id="s5">
         <source src="http://www.pacdv.com/sounds/people_sound_effects/ahhh.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="s6">
+        <source src="http://www.pacdv.com/sounds/voices/yes-hahahaa.wav" type="audio/mp3" />
     </audio>
 
     <div id="1" class="gDiv red unclickable"></div>
