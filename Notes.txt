@@ -1,4 +1,1 @@
-﻿count düzenlemesi yapılacak.
-fail durumunda ses dışında bir düzenleme
-yapılabilirse bir beklemem timer katılacak.
-son olarak biraz görsellik katılacak.
+﻿son olarak biraz görsellik katılacak.

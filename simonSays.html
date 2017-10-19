@@ -71,7 +71,6 @@
             var isStrict = false;
 
             gameConfig.starter = function () {
-                this.count = 0;
                 this.timeStep = 600;
                 gameConfig.lock = false;
 
@@ -93,7 +92,7 @@
 
             function addStep() {
                 sequence.push(Math.floor(Math.random() * 4 )+1); 
-                gameConfig.toHndl = setTimeout(playSequence, 500);
+                setTimeout(playSequence, 500);
             }
 
             function playSequence() {
@@ -124,11 +123,12 @@
                             gameConfig.currPush.removeClass('opacity');
                             gameConfig.index++;
                             if (gameConfig.index == 20) {
-                                $('.push').removeClass('clickable').addClass('unclickable');
+                                $('.gDiv').removeClass('clickable').addClass('unclickable');
                                 playWinSound(pushObj);
                             }
                             else if (gameConfig.index == sequence.length) {
-                               $('.push').removeClass('clickable').addClass('unclickable');
+                                $('.gDiv').removeClass('clickable').addClass('unclickable');
+                                $('#count').val(sequence.length);
                                addStep();
                             }
                         }, 400);
@@ -136,8 +136,10 @@
                     else {
                         if (isStrict == true) {
                             sequence = [];
+                            $('#count').val(sequence.length);
+                            $("#count").fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150);
                         }
-                        $('.push').removeClass('clickable').addClass('unclickable');
+                        $('.gDiv').removeClass('clickable').addClass('unclickable');
                         playFailSound(pushObj);
                         $('#stBtn').text('Retry');
                     }
@@ -145,14 +147,16 @@
             };
 
             function gameStart() {
-                if (isOn) {
+                if (isOn && sequence.length==0) {
                     gameConfig.starter();
                     addStep();
+                }
+                else if (sequence.length > 0) {
+                    setTimeout(playSequence, 500);
                 }
                 else {
                     alert('Pleaste Start The Machine');
                 }
-                
             }
 
             $('#onofswitch').click(function () {
@@ -196,6 +200,7 @@
             });
 
             $('#stBtn').click(function () { gameStart(); });
+            
         });
     </script>
     <audio id="s1">
