@@ -1,4 +1,4 @@
-﻿Sıralı oyantma tamam
-strict mode olayına bakmak lazım.
-display ve count düzenlemesi yapılacak.
+﻿count düzenlemesi yapılacak.
+fail durumunda ses dışında bir düzenleme
+yapılabilirse bir beklemem timer katılacak.
 son olarak biraz görsellik katılacak.

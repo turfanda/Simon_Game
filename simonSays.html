@@ -66,12 +66,15 @@
         
         $(function () {
             var gameConfig = {};
+            var sequence = [];
+            var isOn = false;
+            var isStrict = false;
 
             gameConfig.starter = function () {
-                this.sequence = [];
                 this.count = 0;
                 this.timeStep = 600;
                 gameConfig.lock = false;
+
             };
 
             function playPushSound(num) {
@@ -89,7 +92,7 @@
             };
 
             function addStep() {
-                gameConfig.sequence.push(Math.floor(Math.random() * 5));
+                sequence.push(Math.floor(Math.random() * 4 )+1); 
                 gameConfig.toHndl = setTimeout(playSequence, 500);
             }
 
@@ -98,11 +101,11 @@
                 gameConfig.index = 0;
                 gameConfig.seqHndl = setInterval(function () {
                     gameConfig.lock = true;
-                    playPushSound(gameConfig.sequence[i]);
+                    playPushSound(sequence[i]);
                     setTimeout(function () {
                         gameConfig.currPush.removeClass('opacity');
                         i++;
-                        if (i === gameConfig.sequence.length) {
+                        if (i === sequence.length) {
                             clearInterval(gameConfig.seqHndl);
                             $('.gDiv').removeClass('unclickable').addClass('clickable');
                             gameConfig.lock = false;
@@ -114,7 +117,7 @@
             function pushColor(pushObj) {
                 if (!gameConfig.lock) {
                     var pushNr = pushObj.attr('id');
-                    if (pushNr == gameConfig.sequence[gameConfig.index] && gameConfig.index < gameConfig.sequence.length) {
+                    if (pushNr == sequence[gameConfig.index] && gameConfig.index < sequence.length) {
                         playPushSound(pushNr);
                         var x = pushNr;
                         setTimeout(function () {
@@ -124,22 +127,32 @@
                                 $('.push').removeClass('clickable').addClass('unclickable');
                                 playWinSound(pushObj);
                             }
-                            else if (gameConfig.index == gameConfig.sequence.length) {
+                            else if (gameConfig.index == sequence.length) {
                                $('.push').removeClass('clickable').addClass('unclickable');
                                addStep();
                             }
                         }, 400);
                     }
                     else {
+                        if (isStrict == true) {
+                            sequence = [];
+                        }
                         $('.push').removeClass('clickable').addClass('unclickable');
                         playFailSound(pushObj);
+                        $('#stBtn').text('Retry');
                     }
                 }
             };
 
             function gameStart() {
-                gameConfig.starter();
-                addStep();
+                if (isOn) {
+                    gameConfig.starter();
+                    addStep();
+                }
+                else {
+                    alert('Pleaste Start The Machine');
+                }
+                
             }
 
             $('#onofswitch').click(function () {
@@ -184,37 +197,6 @@
 
             $('#stBtn').click(function () { gameStart(); });
         });
-
-
-
-
-
-        function pushColor(pushObj) {
-            if (!gameStatus.lock) {
-                clearTimeout(gameStatus.toHndl);
-                var pushNr = pushObj.attr('id');
-                if (pushNr == gameStatus.sequence[gameStatus.index] && gameStatus.index < gameStatus.sequence.length) {
-
-                    playGoodTone(pushNr);
-                    gameStatus.lastPush = pushObj;
-                    gameStatus.index++;
-                    if (gameStatus.index < gameStatus.sequence.length) {
-                        gameStatus.toHndl = setTimeout(notifyError, 5 * gameStatus.timeStep);
-                    } else if (gameStatus.index == 20) {
-                        $('.push').removeClass('clickable').addClass('unclickable');
-                        gameStatus.toHndl = setTimeout(notifyWin, gameStatus.timeStep);
-                    } else {
-                        $('.push').removeClass('clickable').addClass('unclickable');
-                        addStep();
-                    }
-                } else {
-                    $('.push').removeClass('clickable').addClass('unclickable');
-                    notifyError(pushObj);
-                }
-            }
-        }
-
-
     </script>
     <audio id="s1">
         <source src="https://s3.amazonaws.com/freecodecamp/simonSound1.mp3" type="audio/mp3" />
