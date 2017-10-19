@@ -7,10 +7,22 @@
     <script src="Scripts/jquery-1.12.4.js"></script>
     <script src="Scripts/jquery-1.12.4.intellisense.js"></script>
     <style>
+        body{
+            background-color:black;
+        }
+        .main{
+            background-color:lavender;
+            width:308px;
+            height:411px;
+            padding:5px 5px 5px 5px;
+            border-radius:5px 5px;
+            margin:40px auto;
+        }
         .gDiv {
             width: 150px;
             height: 150px;
             display: inline-block;
+            border-radius:5px 5px;
         }
 
         .red {
@@ -30,7 +42,7 @@
         }
 
         .opacity {
-            opacity: 0.5;
+            opacity: 0.3;
         }
 
         #onofdiv, #strictdiv {
@@ -38,6 +50,7 @@
             height: 15px;
             width: 30px;
             padding: 2px;
+            margin: 0 32px 0 32px;
         }
 
         #onofswitch, #strictswitch {
@@ -47,8 +60,16 @@
             float: left;
         }
 
-        .inline {
-            display: inline;
+        .box2 {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        p {
+            margin-bottom: 1px !important;
         }
 
         .clickable {
@@ -59,11 +80,40 @@
         .unclickable {
             pointer-events: none;
         }
+
+        #box {
+            width: 310px;
+            height: 310px;
+            display: inline-block;
+        }
+
+        #count {
+            width: 90px;
+            height: 50px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 30px;
+            border-style: solid;
+            border-color: lavender;
+            background-color: antiquewhite;
+        }
+        #stBtn{
+            margin-top:10px;
+        }
+        .setBox {
+            background-color: antiquewhite;
+            width: 308px;
+            border-radius:5px 5px;
+        }
+        h1 {
+text-align:center;
+            color:lavender;
+        }
     </style>
 </head>
 <body>
     <script>
-        
+
         $(function () {
             var gameConfig = {};
             var sequence = [];
@@ -72,6 +122,7 @@
 
             gameConfig.starter = function () {
                 this.timeStep = 600;
+                $('.setBox').removeClass('clickable').addClass('unclickable');
                 gameConfig.lock = false;
 
             };
@@ -91,7 +142,7 @@
             };
 
             function addStep() {
-                sequence.push(Math.floor(Math.random() * 4 )+1); 
+                sequence.push(Math.floor(Math.random() * 4) + 1);
                 setTimeout(playSequence, 500);
             }
 
@@ -129,7 +180,7 @@
                             else if (gameConfig.index == sequence.length) {
                                 $('.gDiv').removeClass('clickable').addClass('unclickable');
                                 $('#count').val(sequence.length);
-                               addStep();
+                                addStep();
                             }
                         }, 400);
                     }
@@ -140,6 +191,7 @@
                             $("#count").fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150);
                         }
                         $('.gDiv').removeClass('clickable').addClass('unclickable');
+                        $('.setBox').removeClass('unclickable').addClass('clickable');
                         playFailSound(pushObj);
                         $('#stBtn').text('Retry');
                     }
@@ -147,7 +199,7 @@
             };
 
             function gameStart() {
-                if (isOn && sequence.length==0) {
+                if (isOn && sequence.length == 0) {
                     gameConfig.starter();
                     addStep();
                 }
@@ -200,7 +252,7 @@
             });
 
             $('#stBtn').click(function () { gameStart(); });
-            
+
         });
     </script>
     <audio id="s1">
@@ -221,18 +273,34 @@
     <audio id="s6">
         <source src="http://www.pacdv.com/sounds/voices/yes-hahahaa.wav" type="audio/mp3" />
     </audio>
+    
+   <h1>Simon Game</h1>
+    <div class="main">
+        <div id="box">
+            <div id="1" class="gDiv red unclickable"></div>
+            <div id="2" class="gDiv green unclickable"></div>
+            <div id="3" class="gDiv blue unclickable"></div>
+            <div id="4" class="gDiv bluev unclickable"></div>
+        </div>
+        <div class="setBox clickable">
+            <div class="box2">
+                <p>On/Of</p>
+                <div id="onofdiv">
+                    <div id="onofswitch"></div>
+                </div>
+            </div>
+            <div class="box2">
+                <p>Strict</p>
+                <div id="strictdiv">
+                    <div id="strictswitch"></div>
+                </div>
+            </div>
+            <div class="box2">
+                <button id="stBtn">Start Game</button><br />
+                <input type="text" id="count" />
+            </div>
+        </div>
+    </div>
 
-    <div id="1" class="gDiv red unclickable"></div>
-    <div id="2" class="gDiv green unclickable"></div>
-    <div id="3" class="gDiv blue unclickable"></div>
-    <div id="4" class="gDiv bluev unclickable"></div>
-    <div id="onofdiv">
-        <div id="onofswitch" class="inline"></div>
-    </div>
-    <div id="strictdiv">
-        <div id="strictswitch"></div>
-    </div>
-    <button id="stBtn">Start Game</button>
-    <input type="text" id="count" />
 </body>
 </html>
