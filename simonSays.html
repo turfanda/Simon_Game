@@ -5,24 +5,25 @@
     <title>Simon Game</title>
     <script src="Scripts/jquery-1.12.4.min.js"></script>
     <script src="Scripts/jquery-1.12.4.js"></script>
-    <script src="Scripts/jquery-1.12.4.intellisense.js"></script>
     <style>
-        body{
-            background-color:black;
+        body {
+            background-color: black;
         }
-        .main{
-            background-color:lavender;
-            width:308px;
-            height:411px;
-            padding:5px 5px 5px 5px;
-            border-radius:5px 5px;
-            margin:40px auto;
+
+        .main {
+            background-color: lavender;
+            width: 308px;
+            height: 411px;
+            padding: 5px 5px 5px 5px;
+            border-radius: 5px 5px;
+            margin: 40px auto;
         }
+
         .gDiv {
             width: 150px;
             height: 150px;
             display: inline-block;
-            border-radius:5px 5px;
+            border-radius: 5px 5px;
         }
 
         .red {
@@ -72,12 +73,12 @@
             margin-bottom: 1px !important;
         }
 
-        .clickable {
+        .clickOn {
             pointer-events: auto;
             cursor: pointer;
         }
 
-        .unclickable {
+        .clickOff {
             pointer-events: none;
         }
 
@@ -97,17 +98,20 @@
             border-color: lavender;
             background-color: antiquewhite;
         }
-        #stBtn{
-            margin-top:10px;
+
+        #stBtn {
+            margin-top: 10px;
         }
+
         .setBox {
             background-color: antiquewhite;
             width: 308px;
-            border-radius:5px 5px;
+            border-radius: 5px 5px;
         }
+
         h1 {
-text-align:center;
-            color:lavender;
+            text-align: center;
+            color: lavender;
         }
     </style>
 </head>
@@ -115,22 +119,15 @@ text-align:center;
     <script>
 
         $(function () {
-            var gameConfig = {};
+            var Config = {};
             var sequence = [];
             var isOn = false;
             var isStrict = false;
 
-            gameConfig.starter = function () {
-                this.timeStep = 600;
-                $('.setBox').removeClass('clickable').addClass('unclickable');
-                gameConfig.lock = false;
-
-            };
-
             function playPushSound(num) {
                 $('#s' + num).get(0).play();
-                gameConfig.currPush = $('#' + num);
-                gameConfig.currPush.addClass('opacity');
+                Config.getVal = $('#' + num)
+                Config.getVal.addClass('opacity');
             };
 
             function playFailSound() {
@@ -141,67 +138,63 @@ text-align:center;
                 $('#s6').get(0).play();
             };
 
-            function addStep() {
+            function oneMore() {
                 sequence.push(Math.floor(Math.random() * 4) + 1);
                 setTimeout(playSequence, 500);
             }
 
             function playSequence() {
                 var i = 0;
-                gameConfig.index = 0;
-                gameConfig.seqHndl = setInterval(function () {
-                    gameConfig.lock = true;
+                Config.index = 0;
+                Config.handler = setInterval(function () {
                     playPushSound(sequence[i]);
                     setTimeout(function () {
-                        gameConfig.currPush.removeClass('opacity');
+                        Config.getVal.removeClass('opacity');
                         i++;
                         if (i === sequence.length) {
-                            clearInterval(gameConfig.seqHndl);
-                            $('.gDiv').removeClass('unclickable').addClass('clickable');
-                            gameConfig.lock = false;
+                            clearInterval(Config.handler);
+                            $('.gDiv').removeClass('clickOff').addClass('clickOn');
                         }
                     }, 400);
-                }, gameConfig.timeStep);
+                }, 600);
             };
 
             function pushColor(pushObj) {
-                if (!gameConfig.lock) {
-                    var pushNr = pushObj.attr('id');
-                    if (pushNr == sequence[gameConfig.index] && gameConfig.index < sequence.length) {
-                        playPushSound(pushNr);
-                        var x = pushNr;
-                        setTimeout(function () {
-                            gameConfig.currPush.removeClass('opacity');
-                            gameConfig.index++;
-                            if (gameConfig.index == 20) {
-                                $('.gDiv').removeClass('clickable').addClass('unclickable');
-                                playWinSound(pushObj);
-                            }
-                            else if (gameConfig.index == sequence.length) {
-                                $('.gDiv').removeClass('clickable').addClass('unclickable');
-                                $('#count').val(sequence.length);
-                                addStep();
-                            }
-                        }, 400);
-                    }
-                    else {
-                        if (isStrict == true) {
-                            sequence = [];
-                            $('#count').val(sequence.length);
-                            $("#count").fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150);
+                var pushNr = pushObj.attr('id');
+                if (pushNr == sequence[Config.index] && Config.index < sequence.length) {
+                    playPushSound(pushNr);
+                    var x = pushNr;
+                    setTimeout(function () {
+                        Config.getVal.removeClass('opacity');
+                        Config.index++;
+                        if (Config.index == 20) {
+                            $('.gDiv').removeClass('clickOn').addClass('clickOff');
+                            playWinSound(pushObj);
                         }
-                        $('.gDiv').removeClass('clickable').addClass('unclickable');
-                        $('.setBox').removeClass('unclickable').addClass('clickable');
-                        playFailSound(pushObj);
-                        $('#stBtn').text('Retry');
+                        else if (Config.index == sequence.length) {
+                            $('.gDiv').removeClass('clickOn').addClass('clickOff');
+                            $('#count').val(sequence.length);
+                            oneMore();
+                        }
+                    }, 400);
+                }
+                else {
+                    if (isStrict == true) {
+                        sequence = [];
+                        $('#count').val(sequence.length);
+                        $("#count").fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150);
                     }
+                    $('.gDiv').removeClass('clickOn').addClass('clickOff');
+                    $('.setBox').removeClass('clickOff').addClass('clickOn');
+                    playFailSound(pushObj);
+                    $('#stBtn').text('Retry');
                 }
             };
 
             function gameStart() {
                 if (isOn && sequence.length == 0) {
-                    gameConfig.starter();
-                    addStep();
+                    $('.setBox').removeClass('clickOn').addClass('clickOff');
+                    oneMore();
                 }
                 else if (sequence.length > 0) {
                     setTimeout(playSequence, 500);
@@ -273,16 +266,16 @@ text-align:center;
     <audio id="s6">
         <source src="http://www.pacdv.com/sounds/voices/yes-hahahaa.wav" type="audio/mp3" />
     </audio>
-    
-   <h1>Simon Game</h1>
+
+    <h1>Simon Game</h1>
     <div class="main">
         <div id="box">
-            <div id="1" class="gDiv red unclickable"></div>
-            <div id="2" class="gDiv green unclickable"></div>
-            <div id="3" class="gDiv blue unclickable"></div>
-            <div id="4" class="gDiv bluev unclickable"></div>
+            <div id="1" class="gDiv red clickOff"></div>
+            <div id="2" class="gDiv green clickOff"></div>
+            <div id="3" class="gDiv blue clickOff"></div>
+            <div id="4" class="gDiv bluev clickOff"></div>
         </div>
-        <div class="setBox clickable">
+        <div class="setBox clickOn">
             <div class="box2">
                 <p>On/Of</p>
                 <div id="onofdiv">
